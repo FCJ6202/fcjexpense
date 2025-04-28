@@ -1,4 +1,4 @@
-cabal-version:      3.14
+cabal-version:      3.4
 -- The cabal-version field refers to the version of the .cabal specification,
 -- and can be different from the cabal-install (the tool) version and the
 -- Cabal (the library) version you are using. As such, the Cabal (the library)
@@ -67,7 +67,7 @@ executable fcjexpense
     -- other-extensions:
 
     -- Other library packages from which modules are imported.
-    build-depends:    base ^>=4.18.2.1
+    build-depends:  base >=4.14 && <5
                    , servant
                    , servant-server
                    , warp
