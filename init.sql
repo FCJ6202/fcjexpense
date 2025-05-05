@@ -15,7 +15,7 @@ CREATE TABLE accounts(
   user_id TEXT,
   created_at TIMESTAMP,
   updated_at TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id)
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE transactions(
@@ -27,6 +27,15 @@ CREATE TABLE transactions(
   amount DECIMAL(10,2),
   created_at TIMESTAMP,
   updated_at TIMESTAMP,
-  FOREIGN KEY (acc_id) REFERENCES accounts(id),
-  FOREIGN KEY (user_id) REFERENCES users(id)
+  FOREIGN KEY (acc_id) REFERENCES accounts(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE user_tokens(
+  id TEXT PRIMARY KEY,
+  user_id TEXT,
+  token TEXT,
+  created_at TIMESTAMP,
+  updated_at TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );

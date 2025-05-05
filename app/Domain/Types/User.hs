@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveAnyClass #-}
 
 module Domain.Types.User where
 
@@ -8,6 +9,8 @@ import Data.Aeson
 import Data.Text
 import Data.Time
 import GHC.Generics
+import Database.SQLite.Simple
+import Database.SQLite.Simple.ToField (toField)
 
 data User = User {
     id :: Text,
@@ -41,6 +44,27 @@ instance FromJSON User where
         <*> v .: "password"
         <*> v .: "created_at"
         <*> v .: "updated_at"
+
+instance FromRow User where
+    fromRow = User
+        <$> field
+        <*> field
+        <*> field
+        <*> field
+        <*> field
+        <*> field
+        <*> field
+
+instance ToRow User where
+    toRow user = [
+        toField (id user),
+        toField (name user),
+        toField (age user),
+        toField (email user),
+        toField (password user),
+        toField (createdAt user),
+        toField (updatedAt user)
+        ]
 
 
 data UserSignupResponse = UserSignupResponse {

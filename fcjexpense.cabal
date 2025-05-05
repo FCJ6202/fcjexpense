@@ -62,7 +62,11 @@ executable fcjexpense
 
     -- Modules included in this executable, other than Main.
     other-modules:    Domain.Types.User,
-                      Storage.Queries.User
+                      Domain.Types.UserToken,
+                      Storage.Queries.User,
+                      Storage.Queries.UserToken,
+                      Domain.Action.User,
+                      Domain.Action.UserToken,
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:

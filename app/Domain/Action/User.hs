@@ -5,6 +5,7 @@
 
 module Domain.Action.User where
 
+import Domain.Action.UserToken
 import Prelude hiding (id)
 import Data.Text
 import Servant
@@ -25,16 +26,19 @@ type UserAPI = "user" :> "signup" :> ReqBody '[JSON] UserSignUpRequest :> Post '
 handler :: Server UserAPI
 handler = signup
 
-generateToken :: User -> Text
-generateToken _ = "token"
-
 signup :: UserSignUpRequest -> Handler UserSignupResponse
 signup userSignUpRequest = do
     user <- liftIO $ makeUser userSignUpRequest
-    result <- liftIO $ createUser user
-    case result of
-        Left err -> throwError $ err500 { errBody = encode err }
-        Right user' -> return $ UserSignupResponse (id user') (generateToken user')
+    createUser user
+    tokenResult <- generateToken (id user)
+    case tokenResult of
+        Nothing -> do
+            removeUser (id user)
+            throwError $ err500 { errBody = encode ("An error occurred while generating token" :: String) }
+        Just token -> return $ UserSignupResponse {
+                                userId = id user,
+                                token = token
+                            }
 
 
 makeUser :: UserSignUpRequest -> IO User
@@ -42,4 +46,12 @@ makeUser userSignUpRequest = do
     userId <- toText <$> nextRandom
     createdAt <- getCurrentTime
     updatedAt <- getCurrentTime
-    return $ User userId (userName userSignUpRequest) (userAge userSignUpRequest) (userEmail userSignUpRequest) (userPassword userSignUpRequest) createdAt updatedAt
+    return $ User{
+        id = userId,
+        name = userName userSignUpRequest,
+        age = userAge userSignUpRequest,
+        email = userEmail userSignUpRequest,
+        password = userPassword userSignUpRequest,
+        createdAt = createdAt,
+        updatedAt = updatedAt
+    }
