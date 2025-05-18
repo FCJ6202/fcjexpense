@@ -41,7 +41,9 @@ getUserById userId = do -- We must have to verify this is valid user which can b
         Left err -> do
             liftIO $ putStrLn $ "Error getting user by id: " <> show err
             throwError $ err500 { errBody = encode ("Error getting user by id: " <> show err :: String) }
-        Right users -> return $ Just (head users)
+        Right users -> case users of
+            [] -> return Nothing
+            (u:_) -> return $ Just u
 
 removeUser :: (MonadIO m, MonadError ServerError m) => Text -> m ()
 removeUser userId = do -- We must have to verify this is valid user which can be done vai newtype Id with domain
@@ -54,3 +56,18 @@ removeUser userId = do -- We must have to verify this is valid user which can be
             liftIO $ putStrLn $ "Error removing user: " <> show err
             throwError $ err500 { errBody = encode ("Error removing user: " <> show err :: String) }
         Right _  -> return ()
+
+getUserByEmail :: (MonadIO m, MonadError ServerError m) => Text -> m (Maybe User)
+getUserByEmail email = do
+    conn <- liftIO $ open "expenseDB"
+    let sql = "SELECT * FROM users WHERE email = ? ORDER BY created_at DESC LIMIT 1"
+    let params = Only email
+    result <- liftIO $ try @SQLError $ query conn sql params
+    case result of
+        Left err -> do
+            liftIO $ putStrLn $ "Error getting user by email: " <> show err
+            throwError $ err500 { errBody = encode ("Error getting user by email: " <> show err :: String) }
+        Right users -> case users of
+            [] -> return Nothing
+            (u:_) -> return $ Just u
+

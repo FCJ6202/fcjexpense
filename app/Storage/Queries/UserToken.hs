@@ -41,3 +41,17 @@ getTokenByUserId userId = do
         Right tokens -> case tokens of
             [] -> return Nothing
             (t:_) -> return $ Just t
+
+getUserIdByToken :: (MonadIO m, MonadError ServerError m) => Text -> m (Maybe Text)
+getUserIdByToken token = do
+    conn <- liftIO $ open "expenseDB"
+    let sql = "SELECT * FROM user_tokens WHERE token = ? ORDER BY created_at DESC LIMIT 1"
+    let params = Only token
+    result <- liftIO $ try @SQLError $ query conn sql params
+    case result of
+        Left err -> do
+            liftIO $ putStrLn $ "Error getting user id by token: " <> show err
+            throwError $ err500 { errBody = encode ("Error getting user id by token: " <> show err :: String) }
+        Right tokens -> case tokens of
+            [] -> return Nothing
+            (t:_) -> return $ Just (userId t)

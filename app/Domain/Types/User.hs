@@ -67,19 +67,19 @@ instance ToRow User where
         ]
 
 
-data UserSignupResponse = UserSignupResponse {
+data UserResponse = UserResponse {
     userId :: Text,
     token :: Text
 } deriving (Show, Eq, Generic)
 
-instance ToJSON UserSignupResponse where
-    toJSON userSignupResponse = object [
-        "userId" .= userId userSignupResponse,
-        "token" .= token userSignupResponse
+instance ToJSON UserResponse where
+    toJSON userResponse = object [
+        "userId" .= userId userResponse,
+        "token" .= token userResponse
         ]
 
-instance FromJSON UserSignupResponse where
-    parseJSON = withObject "UserSignupResponse" $ \v -> UserSignupResponse
+instance FromJSON UserResponse where
+    parseJSON = withObject "UserResponse" $ \v -> UserResponse
         <$> v .: "userId"
         <*> v .: "token"
 
@@ -105,3 +105,7 @@ instance FromJSON UserSignUpRequest where
         <*> v .: "userEmail"
         <*> v .: "userPassword"
 
+data UserLoginRequest = UserLoginRequest {
+    loginEmail :: Text,
+    loginPassword :: Text
+} deriving (Show, Eq, Generic, FromJSON)

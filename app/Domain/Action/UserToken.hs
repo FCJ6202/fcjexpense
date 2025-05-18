@@ -18,15 +18,15 @@ import Control.Monad.Error.Class (throwError, MonadError)
 import Servant.Server (ServerError, err500, errBody)
 import Data.Aeson (encode)
 
-generateToken :: (MonadIO m, MonadError ServerError m) => Text -> m (Maybe Text)
+generateToken :: (MonadIO m, MonadError ServerError m) => Text -> m Text
 generateToken userId = do
     userData <- UT.getTokenByUserId userId
     case userData of
-        Just user -> return $ Just $ token user
+        Just user -> return $ token user
         Nothing  -> do
             userTokenData <- makeUserToken userId
             UT.createUserToken userTokenData
-            return $ Just $ token userTokenData
+            return $ token userTokenData
 
 
 makeUserToken :: (MonadIO m, MonadError ServerError m) => Text -> m UserToken
